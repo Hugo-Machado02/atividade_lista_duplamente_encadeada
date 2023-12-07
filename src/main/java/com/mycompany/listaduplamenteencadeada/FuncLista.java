@@ -31,67 +31,121 @@ public class FuncLista {
         if(this.qtdElementos == 0){
             addInicio(num);
         }else{
-            Celula nova = new Celula(num); //cria uma nova célula e insere o dado na célula
-                                                //como a célula será inserida ao final da lista, não há próximo elemento
-            this.ultima.setProxima(nova);   //Configura o novo final da lista, o próximo a partir da referência ultimo para a nova célula
-            nova.setAnterior(this.ultima);  //configura a referência anterior da nova célula para aonde ultima está apontando
-            this.ultima = nova; //atualiza o final da lista, ultima passa a apontar para a nova célula
+            Celula nova = new Celula(num);
+            
+            this.ultima.setProxima(nova);
+            nova.setAnterior(this.ultima);
+            this.ultima = nova;
             this.qtdElementos++;
         }
     }
     
-    void addMeio(int pos, Object num){
-        if(pos==0){
-            this.addInicio(num);
+    void addMeio(Celula pos, Object num){
+        Celula ant = pos;
+        Celula prox = pos.getProxima();
             
-        }else if(pos==this.qtdElementos){
-            this.addFinal(num);
-            
-        }else{
-            Celula ant = this.buscaCelula(pos-1);
-            Celula prox = ant.getProxima();
-            
-            Celula nova = new Celula(ant.getProxima(),num);
-            nova.setAnterior(ant);
-            ant.setProxima(nova);
-            prox.setAnterior(nova);
-            this.qtdElementos++;
-        }
+        Celula nova = new Celula(ant.getProxima(),num);
+        nova.setAnterior(ant);
+        ant.setProxima(nova);
+        prox.setAnterior(nova);
+        this.qtdElementos++;
     }
     
-    boolean contem(Object num){
+    void removePrimosInicio(Celula pos){
+        this.primeira.anterior = null;
+        this.primeira = this.primeira.getProxima();
+        
+        this.qtdElementos--;
+    }
+    
+    void removePrimosFinal(Celula pos){
+        Celula penultima = this.ultima.getAnterior();
+        penultima.setProxima(null);
+        this.ultima = penultima;
+        
+        this.qtdElementos--;
+    }
+    
+    void removePrimosMeio(Celula pos){
+        Celula ant = pos.getAnterior();
+        Celula prox = pos.getProxima();
+        
+        ant.setProxima(prox);
+        prox.setAnterior(ant);
+        
+        this.qtdElementos--;
+    }
+        
+    
+    Celula buscaPosicao(Object num) {
         Celula atual = this.primeira;
-        while(atual!=null){
-            if(atual.getNumero().equals(num)){
+        Celula prox = atual.getProxima();
+        Celula posicao = null;
+
+        while(posicao == null){
+            Object validaAtual = atual.Numero;
+            Object ValidaProx = prox.Numero;
+            if (validaAtual instanceof Number && num instanceof Number && ValidaProx instanceof Number){
+                Number numAtual = (Number) validaAtual;
+                Number numVal = (Number) num;
+                Number numprox = (Number) ValidaProx;
                 
-                return(true);
+                if (numAtual.doubleValue() <= numVal.doubleValue() && numprox.doubleValue() >= numVal.doubleValue()) {
+                    posicao = atual;
+                }else{
+                    atual = prox;
+                    prox = prox.getProxima();
+                }
+            }
+        }
+        return(posicao);
+    }
+    
+    int buscarValor(Celula pos){
+        Celula atual = pos;
+        int valor = 0;
+        Object validaAtual = atual.Numero;
+        if (validaAtual instanceof Integer) {
+            valor = (int) validaAtual;
+        }
+        return(valor);
+    }
+    
+    Boolean validarPrimos(int valor){
+        
+        for(int i = 2; i < valor; i++){
+            if (valor % i == 0){
+                return false;  }
+        }
+        return(true);
+    }
+    
+    void ExcluirPrimos(){
+        Celula atual = this.primeira;
+        for(int i=0; i<this.qtdElementos; i++){
+            int valor = buscarValor(atual);
+            if(validarPrimos(valor)){
+                System.out.println("Primo: "+atual.getNumero());
+            }
+            else{
+                System.out.println("Não Primo: "+atual.getNumero());
             }
             atual = atual.getProxima();
         }
-        return(false);
     }
     
-    Celula buscaCelula(int pos){
-        if(!this.posicaoOcupada(pos)){
-           System.out.println("Erro: posição não existe");
-           return null;
-        }else{
-            Celula atual = this.primeira;
-            for(int i=0;i<pos;i++){
-                atual = atual.getProxima();
-            }
-            return(atual);
-        } 
-        
-    }
-    
-    Object busca(int pos){
-        return(this.buscaCelula(pos).getNumero());
-        
-    }
-    
-    boolean posicaoOcupada(int pos){
-        return((pos>=0)&&(pos<this.qtdElementos));
-        
+    void imprimirLista(){
+        System.out.print("Números = [");
+        Celula atual = this.primeira;
+        for(int i=0; i<this.qtdElementos; i++){
+             if(i==0){
+                 System.out.print(atual.getNumero());
+             }
+             else{
+                 System.out.print(", "+atual.getNumero());
+             }
+             atual = atual.getProxima();
+        }
+        System.out.print("]");
     }
 }
